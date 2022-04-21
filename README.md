@@ -1,5 +1,5 @@
 # 📺 Boards
-Boards is a CLI written in node.js that shows accurate & live railway station deaprture boards in the terminal, using data sourced from the [National Rail Enquiries API](https://www.nationalrail.co.uk/46391.aspx).
+Boards is a CLI written in node.js that shows accurate & live railway station departure boards in the terminal, using data sourced from the [National Rail Enquiries API](https://www.nationalrail.co.uk/46391.aspx).
 
 ## Using Boards
 Generating a live departure board is easy, and can be done in the terminal using just one command!
