@@ -13,6 +13,8 @@ Please note the following parameters:
 | CRS | The Computer Reservation System code for the station, you can find a list of all of these [here](https://www.nationalrail.co.uk/stations_destinations/48541.aspx) | Yes | - |
 | NUM | The number of services to display on the board | No | 10 |
 
+Boards keeps running to provide a live feed of all services, but can be stopped by using `Ctrl + C` to terminate the program.
+
 ## Example
 Running Boards to generate a live departure board for [Birmingham New Street Station](https://www.networkrail.co.uk/communities/passengers/our-stations/birmingham-new-street/)
 ```shell
