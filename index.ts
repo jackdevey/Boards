@@ -6,7 +6,7 @@ import ora from "ora";
 dotenv.config();
 
 // Log in to NR api
-const api = new LDBWSClient(process.env.TOKEN)
+const api = new LDBWSClient(process.env.TOKEN!!)
 
 // Get the station code args
 const crs = process.argv[2].toUpperCase();
@@ -108,4 +108,3 @@ function formatString(string, maxLength) {
     }
     return result
 }
-
