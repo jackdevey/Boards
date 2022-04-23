@@ -1,33 +1,35 @@
-const { NationalRailWrapper } = require("ts-national-rail-wrapper")
-const chalk = require('chalk');
+import { LDBWSClient } from "ldbws-client";
+import dotenv from "dotenv";
+import chalk from "chalk";
+import ora from "ora";
 
-// Use dotenv
-require('dotenv').config()
+dotenv.config();
 
 // Log in to NR api
-const nationalRail = new NationalRailWrapper(process.env.TOKEN)
+const api = new LDBWSClient(process.env.TOKEN)
 
 // Get the station code args
 const crs = process.argv[2].toUpperCase();
 
 // Get the number of services
 if (process.argv.length == 4) {
-    num = process.argv[3]
+    var num = process.argv[3]
 } else num = 10
 
 // Clear the terminal before printing
-print("\033c");
+print("\x1Bc");
 // Add loading message
-print(chalk.gray("Loading departure board for " + crs + "..."));
+
+const spinner = ora("Loading departure board for " + crs).start();
 
 // Update the data every 30 seconds
 async function update() {
     // Move the cursor to remove the new line
     setTimeout(async function () {
         // Get the departures from NR
-        var resp = await nationalRail.getDepartures({ fromStation: crs, count: num });
+        var resp = await api.GetDepartureBoard(crs, num);
         // Move the cursor to write over the previous table
-        print("\033[5;0H");
+        print("\x1B[5;0H");
         // Print the data
         printBody(resp);
         // Live updates
@@ -39,21 +41,23 @@ async function update() {
 const get = async () => {
     // Get the departures from NR
     try {
-        var resp = await nationalRail.getDepartures({ fromStation: crs, count: num });
+        var resp = await api.GetDepartureBoard(crs, num);
     } catch(err) {
         // If an error occured
         print(chalk.red("\nError: " + err.message));
         return
     }
-    // Clear the terminal to remove loading message
-    print("\033c");
+    // Stop spinning & clear the terminal 
+    // to remove loading message
+    spinner.stop();
+    print("\x1Bc");
     // Print the title block
     title("BHM");
     // Print the table headings
     print(chalk.bold(formatString("Time", 5)));
     print(chalk.bold(formatString("Destination", 25)));
     print(chalk.bold(formatString("Plat", 4)));
-    print(chalk.bold(formatString("Expected", 9)));
+    print(chalk.bold(formatString("Expected", 11)));
     print(chalk.bold(formatString("Operator", 30)) + "\n");
     // Print the data
     printBody(resp);
@@ -65,18 +69,16 @@ get()
 
 // Print the main body of data from the response
 function printBody(resp) {
-    for (i in resp.data) {
-        // Get each departure
-        var departure = resp.data[i];
+    resp.trainServices.service.forEach(departure => {
         // If there isn't a platform, set it to "-"
         if (departure.platform != null) {
             var platform = departure.platform
         } else platform = "-"
         // Calculate formatting for the expected time
         var expected
-        if (departure.etd == "On time") expected = chalk.green(formatString(departure.etd, 9))
-        else if (departure.etd == "Cancelled") expected = chalk.red(formatString(departure.etd, 9))
-        else expected = chalk.yellow(formatString(departure.etd, 9))
+        if (departure.etd == "On time") expected = chalk.green(formatString("✓ " + departure.etd, 11))
+        else if (departure.etd == "Cancelled") expected = chalk.red(formatString("✗ " + departure.etd, 11))
+        else expected = chalk.yellow(formatString("! " + departure.etd, 11))
         // Print the row out
         print(chalk.gray(formatString(departure.std, 5)))
         print(chalk.white(formatString(departure.destination.location[0].locationName, 25)))
@@ -84,12 +86,12 @@ function printBody(resp) {
         print(expected)
         print(chalk.grey(formatString(departure.operator, 30)))
         print("\n") // New line for next row
-    }
+    });
 }
 
 // Prin the title block
 function title() {
-    print(chalk.red("LIVE") + chalk.white(" Departures from " + crs + "\n")) // Station code
+    print(chalk.redBright("LIVE") + chalk.white(" Departures from " + crs + "\n")) // Station code
     print(chalk.gray("Powered by National Rail Enquiries\n")) // NR Attribution
     console.log() // New line for spacing
 }
@@ -101,7 +103,7 @@ function print(string) { process.stdout.write(string); }
 function formatString(string, maxLength) {
     var spaces = maxLength - string.length;
     var result = string;
-    for (i = 0; i < spaces + 2; i++) {
+    for (var i = 0; i < spaces + 2; i++) {
         result += " "
     }
     return result
