@@ -10,7 +10,7 @@ boards [CRS] [NUM]
 Please note the following parameters:
 | Name | Description | Required | Default |
 | - | - | - | - |
-| CRS | The Computer Reservation System code for the station, you can find a list of all of these [here](https://www.nationalrail.co.uk/stations_destinations/48541.aspx) | Yes | - |
+| CRS | The Computer Reservation System code for the station, you can find a list of all of these [here](http://www.railwaycodes.org.uk/crs/crs0.shtm) | Yes | - |
 | NUM | The number of services to display on the board | No | 10 |
 
 Boards keeps running to provide a live feed of all services, but can be stopped by using `Ctrl + C` to terminate the program.
